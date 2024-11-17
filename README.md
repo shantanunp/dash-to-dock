@@ -25,7 +25,7 @@ export SASS=ruby
 ```
 
 ### Building
-
+~/.local/share/gnome-shell/extensions/
 Clone the repository or download the branch from github. A simple Makefile is included.
 
 Next use `make` to install the extension into your home directory. A Shell reload is required `Alt+F2 r Enter` under Xorg or under Wayland you may have to logout and login. The extension has to be enabled  with *gnome-extensions-app* (GNOME Extensions) or with *dconf*.

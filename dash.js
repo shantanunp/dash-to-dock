@@ -26,6 +26,7 @@ import {
     Theming,
     Utils,
 } from './imports.js';
+import * as DateMenu from 'resource:///org/gnome/shell/ui/dateMenu.js';
 
 // module "Dash" does not export DASH_ANIMATION_TIME
 // so we just define it like it is defined in Dash;
@@ -236,6 +237,73 @@ export const DockDash = GObject.registerClass({
 
         this.add_child(this._background);
         this.add_child(this._dashContainer);
+
+        this._clockContainer = new St.BoxLayout({
+            vertical: true, // Set the layout to vertical
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            style: 'background-color: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px;',
+            reactive: true,
+        });
+        //
+        // // Add the date label
+        // this._dateLabel = new St.Label({
+        //     text: GLib.DateTime.new_now_local().format('%b %d'), // Example: "Nov 16"
+        //     style: 'font-size: 14px; font-weight: bold; color: white; margin-bottom: 5px;',
+        // });
+        //
+        // // Add the time label
+        // this._timeLabel = new St.Label({
+        //     text: GLib.DateTime.new_now_local().format('%H:%M %p'), // Example: "9:55 PM"
+        //     style: 'font-size: 14px; color: white;',
+        // });
+        //
+        // // Add labels to the clock container
+        // this._clockContainer.add_child(this._dateLabel);
+        // this._clockContainer.add_child(this._timeLabel);
+        //
+        // // Update the clock every second
+        // this._clockTimeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => {
+        //     this._dateLabel.text = GLib.DateTime.new_now_local().format('%b %d');
+        //     this._timeLabel.text = GLib.DateTime.new_now_local().format('%H:%M %p');
+        //     return GLib.SOURCE_CONTINUE;
+        // });
+
+        // let dateMenuButton = new DateMenu.DateMenuButton();
+        // dateMenuButton.container.style = 'margin-top: 10px;'; // Add spacing from the clock
+        // this._clockContainer.add_child(dateMenuButton.container);
+
+        // Handle the Date Menu
+        let dateMenu = Main.panel.statusArea.dateMenu; // Access the Date Menu
+        if (dateMenu && dateMenu.container) {
+            // Remove the Date Menu from its parent (main panel)
+            if (dateMenu.container.get_parent()) {
+                dateMenu.container.get_parent().remove_child(dateMenu.container);
+            }
+
+            // Add the Date Menu to your custom container
+            dateMenu.container.style = 'margin-top: 10px;';
+            this._clockContainer.add_child(dateMenu.container);
+        } else {
+            logError('DateMenu container is undefined.');
+        }
+
+        // journalctl /usr/bin/gnome-shell -f
+        log( "Hi first log .......");
+
+        let quickSettings = Main.panel.statusArea.quickSettings;
+        if (quickSettings && quickSettings.container) {
+            // Remove from current parent before re-adding
+            if (quickSettings.container.get_parent()) {
+                quickSettings.container.get_parent().remove_child(quickSettings.container);
+            }
+            quickSettings.container.style = 'margin-top: 10px;';
+            this._clockContainer.add_child(quickSettings.container);
+        } else {
+            logError('QuickSettings container is undefined.');
+        }
+
+        this._dashContainer.insert_child_at_index(this._clockContainer, 0);
 
         this._workId = Main.initializeDeferredWork(this._box, this._redisplay.bind(this));
 
